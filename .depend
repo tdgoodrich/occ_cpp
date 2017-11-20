@@ -1,0 +1,10 @@
+bitvec.o: bitvec.c bitvec.h bit-twiddling.h
+flow.o: flow.c bitvec.h bit-twiddling.h flow.h graph.h util.h
+graph.o: graph.c bitvec.h bit-twiddling.h graph.h util.h
+main.o: main.c bitvec.h bit-twiddling.h graph.h occ.h
+occ.o: occ.c bitvec.h bit-twiddling.h flow.h graph.h occ.h util.h
+occ-enum2col.o: occ-enum2col.c bitvec.h bit-twiddling.h flow.h graph.h \
+ occ.h
+occ-gray.o: occ-gray.c bitvec.h bit-twiddling.h flow.h graph.h occ.h \
+ util.h
+util.o: util.c util.h

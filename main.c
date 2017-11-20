@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or
@@ -54,52 +54,61 @@ bool verbose    = false;
 bool stats_only = false;
 unsigned long long augmentations = 0;
 
-struct bitvec *find_occ(const struct graph *g) {
+struct bitvec *find_occ(const struct graph *g)
+{
     struct bitvec *occ = NULL;
-    
+
     occ = bitvec_make(g->size);
     ALLOCA_BITVEC(sub, g->size);
 
-    for (size_t i = 0; i < g->size; i++) {
-	bitvec_set(sub, i);
-	struct graph *g2 = graph_subgraph(g, sub);
-	if (occ_is_occ(g2, occ)) {
-	    graph_free(g2);
-	    continue;
-	}
-	bitvec_set(occ, i);
-	if (verbose) {
-	    fprintf(stderr, "size = %3lu ", (unsigned long) graph_num_vertices(g2));
-	    fprintf(stderr, "occ = ");
-	    bitvec_dump(occ);
-	    putc('\n', stderr);
-	}
-	struct bitvec *occ_new = occ_shrink(g2, occ, enum2col,
-						use_gray, true);
-	if (occ_new) {
-	    free(occ);
-	    occ = occ_new;
-	    if (!occ_is_occ(g2, occ)) {
-		fprintf(stderr, "Internal error!\n");
-		abort();
+    for (size_t i = 0; i < g->size; ++i)
+    {
+	    bitvec_set(sub, i);
+	    struct graph *g2 = graph_subgraph(g, sub);
+	    if (occ_is_occ(g2, occ))
+        {
+	        graph_free(g2);
+	        continue;
 	    }
-	}
-	graph_free(g2);
+	    bitvec_set(occ, i);
+	    if (verbose)
+        {
+	        fprintf(stderr, "size = %3lu ", (unsigned long) graph_num_vertices(g2));
+	        fprintf(stderr, "occ = ");
+	        bitvec_dump(occ);
+	        putc('\n', stderr);
+	    }
+
+	    struct bitvec *occ_new = occ_shrink(g2, occ, enum2col, use_gray, true);
+
+        if (occ_new)
+        {
+	        free(occ);
+	        occ = occ_new;
+	        if (!occ_is_occ(g2, occ))
+            {
+		        fprintf(stderr, "Internal error!\n");
+		        abort();
+	        }
+	    }
+	    graph_free(g2);
     }
     return occ;
 }
 
 int main(int argc, char *argv[]) {
     int c;
-    while ((c = getopt(argc, argv, "bgvsh")) != -1) {
-	switch (c) {
-	case 'b': enum2col   = true; break;
-	case 'g': use_gray   = true; break;
-	case 'v': verbose    = true; break;
-	case 's': stats_only = true; break;
-	case 'h': usage(stdout); exit(0); break;
-	default:  usage(stderr); exit(1); break;
-	}
+    while ((c = getopt(argc, argv, "bgvsh")) != -1)
+    {
+	    switch (c)
+        {
+	        case 'b': enum2col   = true; break;
+	        case 'g': use_gray   = true; break;
+	        case 'v': verbose    = true; break;
+	        case 's': stats_only = true; break;
+	        case 'h': usage(stdout); exit(0); break;
+	        default:  usage(stderr); exit(1); break;
+	    }
     }
 
     const char **vertices;
@@ -110,13 +119,16 @@ int main(int argc, char *argv[]) {
 
     occ_size = bitvec_count(occ);
     if (!stats_only)
-	BITVEC_ITER(occ, v)
-	    puts(vertices[v]);
-    
+    {
+	    BITVEC_ITER(occ, v) puts(vertices[v]);
+    }
+
     if (stats_only)
-	printf("%5lu %6lu %5lu %10.2f %16llu\n",
+    {
+	       printf("%5lu %6lu %5lu %10.2f %16llu\n",
 	       (unsigned long) g->size, (unsigned long) graph_num_edges(g),
 	       (unsigned long) occ_size, user_time(), augmentations);
+    }
 
     return 0;
 }

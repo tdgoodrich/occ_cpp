@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or
@@ -43,31 +43,41 @@ static struct graph *occ_construct_h(struct occ_problem *problem) {
     graph_two_coloring(problem->h, coloring);
     problem->h = graph_grow(problem->h, size + problem->occ_size);
     size_t clone = 0;
-    BITVEC_ITER(problem->occ, v) {
-	problem->occ_vertices[clone] = v;
-	problem->clones[v] = problem->first_clone + clone;
+    BITVEC_ITER(problem->occ, v)
+    {
+	    problem->occ_vertices[clone] = v;
+	    problem->clones[v] = problem->first_clone + clone;
 
-	vertex w;
-	GRAPH_NEIGHBORS_ITER(problem->g, v, w) {
-	    if (bitvec_get(problem->occ, w) && v > w)
-		continue;
-	    if (bitvec_get(coloring, w))
-		graph_connect(problem->h, v, w);
-	    else
-		graph_connect(problem->h, problem->clones[v], w);
-	}
-	clone++;
+	    vertex w;
+	    GRAPH_NEIGHBORS_ITER(problem->g, v, w)
+        {
+	        if (bitvec_get(problem->occ, w) && v > w)
+            {
+		        continue;
+            }
+
+    	    if (bitvec_get(coloring, w))
+            {
+    		    graph_connect(problem->h, v, w);
+            }
+    	    else
+            {
+    		    graph_connect(problem->h, problem->clones[v], w);
+            }
+	    }
+	    ++clone;
     }
 
     assert(graph_is_bipartite(problem->h));
     return problem->h;
 }
 
-bool occ_is_occ(const struct graph *g, const struct bitvec *occ) {
+bool occ_is_occ(const struct graph *g, const struct bitvec *occ)
+{
     assert(g->size == occ->num_bits);
     ALLOCA_U_BITVEC(not_occ, g->size);
     bitvec_copy(not_occ, occ);
-    bitvec_invert(not_occ);    
+    bitvec_invert(not_occ);
     struct graph *g2 = graph_subgraph(g, not_occ);
     bool occ_is_occ = graph_is_bipartite(g2);
     graph_free(g2);
@@ -76,52 +86,72 @@ bool occ_is_occ(const struct graph *g, const struct bitvec *occ) {
 
 struct bitvec *occ_shrink(const struct graph *g, const struct bitvec *occ,
 			  bool enum2col, bool use_graycode,
-			  bool last_not_in_occ) {
+			  bool last_not_in_occ)
+{
     assert(occ_is_occ(g, occ));
     assert(graph_size(g) == bitvec_size(occ));
     size_t occ_size = bitvec_count(occ);
     if (occ_size == 0 || (last_not_in_occ && occ_size == 1))
+    {
         return NULL;
+    }
 
     // Ensure minimality first.
     struct bitvec *new_occ = bitvec_clone(occ);
     BITVEC_ITER(occ, v) {
 	bitvec_unset(new_occ, v);
-	if (occ_is_occ(g, new_occ)) {
+	if (occ_is_occ(g, new_occ))
+    {
 	    if (verbose)
-		fprintf(stderr, "omitting redundant %d\n", (int) v);
-	} else {
+        {
+		    fprintf(stderr, "omitting redundant %d\n", (int) v);
+        }
+	}
+    else
+    {
 	    bitvec_set(new_occ, v);
 	}
-	
+
     }
+
     if (bitvec_count(new_occ) < bitvec_count(occ))
-	return new_occ;
+    {
+	    return new_occ;
+    }
+
     bitvec_free(new_occ);
 
     size_t h_size = g->size + occ_size;
-    struct occ_problem *problem = &(struct occ_problem) {
-	.g               = g,
-	.occ             = occ,
-	.sources	 = bitvec_make(h_size),
-	.targets	 = bitvec_make(h_size),
-	.num_sources     = 0,
-	.use_graycode    = use_graycode,
-	.last_not_in_occ = last_not_in_occ,
-	.occ_size        = occ_size,
-	.first_clone	 = graph_size(g),
+    struct occ_problem *problem = &(struct occ_problem)
+    {
+    	.g               = g,
+    	.occ             = occ,
+    	.sources	 = bitvec_make(h_size),
+    	.targets	 = bitvec_make(h_size),
+    	.num_sources     = 0,
+    	.use_graycode    = use_graycode,
+    	.last_not_in_occ = last_not_in_occ,
+    	.occ_size        = occ_size,
+    	.first_clone	 = graph_size(g),
     };
+
     occ_construct_h(problem);
     problem->flow = flow_make(problem->h);
 
     if (enum2col)
-	new_occ = occ_shrink_enum2col(problem);
+    {
+	    new_occ = occ_shrink_enum2col(problem);
+    }
     else
+    {
         new_occ = occ_shrink_gray(problem);
+    }
 
     if (verbose)
-	fprintf(stderr, "%llu flow augmentations\n",
-                (unsigned long long) augmentations);
+    {
+	    fprintf(stderr, "%llu flow augmentations\n",
+        (unsigned long long) augmentations);
+    }
 
     graph_free(problem->h);
     bitvec_free(problem->sources);

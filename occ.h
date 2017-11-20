@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or
@@ -42,10 +42,8 @@ struct occ_problem {
 
 bool occ_is_occ(const struct graph *g, const struct bitvec *occ);
 struct bitvec *occ_shrink(const struct graph *g, const struct bitvec *occ,
-			  bool enum2col, bool use_graycode,
-			  bool last_not_in_occ);
+    bool enum2col, bool use_graycode, bool last_not_in_occ);
 struct bitvec *occ_heuristic(const struct graph *g);
-
 struct bitvec *occ_shrink_gray(struct occ_problem *problem);
 struct bitvec *occ_shrink_enum2col(struct occ_problem *problem);
 

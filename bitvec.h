@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or

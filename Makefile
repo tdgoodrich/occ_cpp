@@ -1,5 +1,5 @@
 CC	= gcc
-CFLAGS	= -std=c99 -O3 -g -W -Wall
+CFLAGS	= -std=c11 -O3 -g -W -Wall
 # disable internal consistency checking for moderate (10-30%) speedup
 #CFLAGS  += -DNDEBUG
 
@@ -58,5 +58,9 @@ realclean: clean
 
 depend: $(SOURCES)
 	$(CC) $(CFLAGS) -MM *.c > .depend
+
+run:
+	./occ < data/afro-americans/32.graph -s -b
+
 
 include .depend
