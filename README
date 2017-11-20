@@ -1,0 +1,116 @@
+This package contains the source and the test data for a graph
+bipartization solver based on iterative compression. A preliminary
+version is described in the paper:
+
+  Falk Hüffner:
+  Algorithm engineering for optimal graph bipartization.
+  In Proceedings of the 4th International Workshop on Efficient and
+  Experimental Algorithms (WEA'05), volume 3503 in Lecture Notes in
+  Computer Science, pages 240--252, Springer 2005.
+  http://dx.doi.org/10.1007/11427186_22
+  http://theinf1.informatik.uni-jena.de/publications/bipartization-wea05.pdf
+
+
+Graph Bipartization solver
+==========================
+
+The purpose is to solve the Grapb Bipartization problem, that is, to
+find a minimum set of vertices in a graph whose deletion makes the
+graph bipartite.
+
+The current version can be obtained at
+http://theinf1.informatik.uni-jena.de/occ/. It is distributed under
+the terms of the GNU General Public License (GPL, see COPYING).
+
+The solver is written in ISO C99 plus a few Unix functions. To build
+the program, you need the GNU gcc compiler (version 3.2 or newer) and
+GNU make. Using other compilers or makes, or building on a non-Unix
+system, will probably require changes to the Makefile and the source.
+
+It has been tested on:
+
+* Debian GNU/Linux (i386) 3.1 with gcc 3.3.5 (Debian 1:3.3.5-13)
+* Digital Unix 5.1 (Alpha) with 3.3.2
+* Solaris 9 (UltraSPARC) with gcc 4.0.2
+
+To compile, run "make".
+
+The program is called "occ". By default, it reads a graph from
+standard input and writes it to standard output. The graph format is a
+simple text format, where each line describes one edge, given by its
+two endpoints separated by whitespace:
+
+v0 v1
+v1 v2
+v2 v0
+
+Vertex names can be any combination of letters, digits, and _. Note
+that this graph format cannot describe degree-0 vertices; however,
+they are irrelevant for Graph Bipartization anyway.
+
+The output is a minimum set of vertices to delete to make the graph
+bipartite. Example:
+
+$ ./occ < data/afro-americans/10.graph
+0
+1
+25
+28
+31
+38
+
+By default, the program executes the unmodified Reed/Smith/Vetta
+algorithm. Option -g enables the use of Gray codes ("OCC-Gray"), and
+option -b uses the "OCC-Enum2Col" algorithm.
+
+With -s, one gets only a single line of output containing some
+statistics:
+
+   n      m    |C|    run time [s]    flow augmentations
+  102    307    11       0.78           671088
+
+
+ILP based solver
+================
+
+The Python script "occ-lp.py" solves graph bipartization by calling
+the ILP solver "glpsol" from the glpk package
+(http://www.gnu.org/software/glpk/glpk.html). It has been tested with
+glpk 4.8.
+
+
+Test data
+=========
+
+The directory "data" contains benchmark instances assembled by
+Sebastian Wernicke. They are based on data made available by the
+Whitehead Institute
+(http://www.broad.mit.edu/mpg/hapmap/hapstruc.html).
+
+See
+
+Sebastian Wernicke.
+On the algorithmic tractability of single nucleotide polymorphism
+(SNP) analysis and related problems.
+Diplomarbeit, Universität Tübingen, 2003.
+http://theinf1.informatik.uni-jena.de/~wernicke/dipl.pdf
+
+for details on the data and the file format.
+
+
+Data generators
+===============
+
+The data generators (directory synth-data) are written in Objective
+Caml (http://caml.inria.fr/). The paper describes how they work.
+
+
+Version history
+===============
+
+1.0 initial release
+1.1 added data, generators, and ILP script
+
+
+-- Falk Hüffner (http://theinf1.informatik.uni-jena.de/~hueffner/)
+   6 October 2006
