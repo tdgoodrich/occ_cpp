@@ -30,7 +30,8 @@
 extern bool verbose;
 extern unsigned long long augmentations;
 
-static struct graph *occ_construct_h(struct occ_problem *problem) {
+static struct graph *occ_construct_h(struct occ_problem *problem)
+{
     size_t size = graph_size(problem->g);
     assert (bitvec_size(problem->occ) == size);
     problem->occ_vertices = calloc(sizeof *problem->occ_vertices, problem->occ_size);

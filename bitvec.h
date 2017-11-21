@@ -71,6 +71,8 @@ static inline bool bitvec_get(const struct bitvec *v, size_t n) {
 }
 
 static inline void bitvec_set(struct bitvec *v, size_t n) {
+    //fprintf(stdout, "n = %d\n", n);
+    //fprintf(stderr, "v.size = %d\n", v->num_bits);
     assert (n < v->num_bits);
     v->data[n / BITS_PER_WORD] |= 1UL << (n % BITS_PER_WORD);
 }

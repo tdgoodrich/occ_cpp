@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or
@@ -35,9 +35,10 @@ struct graph {
     size_t capacity;
     size_t size;
     struct vertex {
-	vertex capacity;
-	vertex deg;
-	vertex neighbors[];
+        /* This used to be vertex, not int */
+	    vertex capacity;
+	    vertex deg;
+	    vertex neighbors[];
     } *vertices[];
 };
 

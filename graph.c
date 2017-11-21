@@ -26,7 +26,7 @@
 size_t graph_num_vertices(const struct graph *g)
 {
     size_t n = 0;
-    for (size_t v = 0; v < g->size; v++)
+    for (size_t v = 0; v < g->size; ++v)
     {
     	if (graph_vertex_exists(g, v))
         {
@@ -39,11 +39,11 @@ size_t graph_num_vertices(const struct graph *g)
 size_t graph_num_edges(const struct graph *g)
 {
     size_t n = 0, _;
-    for (size_t v = 0; v < g->size; v++)
+    for (size_t v = 0; v < g->size; ++v)
     {
     	if (graph_vertex_exists(g, v))
         {
-    	    GRAPH_NEIGHBORS_ITER(g, v, _) n++;
+    	    GRAPH_NEIGHBORS_ITER(g, v, _) ++n;
         }
     }
     assert ((n % 2) == 0);
@@ -54,7 +54,7 @@ struct graph *graph_copy(const struct graph *g)
 {
     struct graph *g2 = malloc(sizeof (struct graph) + g->size * sizeof (struct vertex *));
     g2->capacity = g2->size = g->size;
-    for (size_t i = 0; i < g->size; i++)
+    for (size_t i = 0; i < g->size; ++i)
     {
     	if (!graph_vertex_exists(g, i))
         {
@@ -89,7 +89,7 @@ struct graph *graph_grow(struct graph *g, size_t size)
 
 void graph_free(struct graph *g)
 {
-    for (size_t v = 0; v < g->size; v++)
+    for (size_t v = 0; v < g->size; ++v)
     {
     	if (graph_vertex_exists(g, v))
         {
@@ -125,11 +125,12 @@ static struct vertex *malloc_vertices(size_t n)
 
 struct graph *graph_make(size_t size)
 {
-    struct graph *g = calloc(sizeof (struct graph)
-			     + size * sizeof *g->vertices, 1);
+    struct graph *g = calloc(sizeof (struct graph) + size * sizeof *g->vertices, 1);
     g->capacity = g->size = size;
-    for (size_t i = 0; i < size; ++i)
-	g->vertices[i] = NULL_NEIGHBORS;
+    for (size_t i = 0; i < size; ++i) {
+
+	    g->vertices[i] = NULL_NEIGHBORS;
+    }
     return g;
 }
 
@@ -153,7 +154,7 @@ void graph_disconnect(struct graph *g, vertex v, vertex w)
     assert(graph_vertex_exists(g, v));
     assert(graph_vertex_exists(g, w));
 
-    for (size_t i = 0; i < g->vertices[v]->deg; i++)
+    for (size_t i = 0; i < g->vertices[v]->deg; ++i)
     {
     	if (g->vertices[v]->neighbors[i] == w)
         {
@@ -162,7 +163,7 @@ void graph_disconnect(struct graph *g, vertex v, vertex w)
     	}
     }
 
-    for (size_t i = 0; i < g->vertices[w]->deg; i++)
+    for (size_t i = 0; i < g->vertices[w]->deg; ++i)
     {
     	if (g->vertices[w]->neighbors[i] == v)
         {
@@ -188,7 +189,7 @@ struct graph *graph_subgraph(const struct graph *g, const struct bitvec *s)
     struct graph *sub = malloc(sizeof (struct graph) + sizeof (void *) * size);
     sub->capacity = sub->size = size;
 
-    for (size_t v = 0; v < g->size; v++)
+    for (size_t v = 0; v < g->size; ++v)
     {
     	size_t new_deg = 0;
     	if (!bitvec_get(s, v) || !graph_vertex_exists(g, v))
@@ -197,16 +198,16 @@ struct graph *graph_subgraph(const struct graph *g, const struct bitvec *s)
     	}
         else
         {
-    	    for (size_t n = 0; n < g->vertices[v]->deg; n++)
+    	    for (size_t n = 0; n < g->vertices[v]->deg; ++n)
             {
         		if (bitvec_get(s, g->vertices[v]->neighbors[n]))
                 {
-                    new_deg++;
+                    ++new_deg;
                 }
     	    }
 
     	    sub->vertices[v] = malloc_vertices(new_deg);
-    	    for (size_t n = 0; n < g->vertices[v]->deg; n++)
+    	    for (size_t n = 0; n < g->vertices[v]->deg; ++n)
             {
         		vertex w =g->vertices[v]->neighbors[n];
         		if (bitvec_get(s, w)) {
@@ -227,7 +228,7 @@ bool graph_two_coloring(const struct graph *g, struct bitvec *colors)
     vertex queue[size];
     vertex *qhead = queue, *qtail = queue;
 
-    for (size_t v0 = 0; v0 < size; v0++)
+    for (size_t v0 = 0; v0 < size; ++v0)
     {
     	if (!graph_vertex_exists(g, v0) || bitvec_get(seen, v0))
         {
@@ -270,7 +271,7 @@ bool graph_is_bipartite(const struct graph *g)
 void graph_output(const struct graph *g, FILE *stream, const char **vertices)
 {
     fprintf(stream, "{ %lu\n", (unsigned long) g->size);
-    for (unsigned v = 0; v < g->size; v++)
+    for (unsigned v = 0; v < g->size; ++v)
     {
     	if (graph_vertex_exists(g, v))
         {
@@ -286,7 +287,7 @@ void graph_output(const struct graph *g, FILE *stream, const char **vertices)
                 }
     	    }
 
-    	    for (unsigned n = 0; n < g->vertices[v]->deg; n++)
+    	    for (unsigned n = 0; n < g->vertices[v]->deg; ++n)
             {
         		unsigned w = g->vertices[v]->neighbors[n];
         		if (v < w)
@@ -318,19 +319,18 @@ struct graph *graph_read(FILE *stream, const char ***vertex_names)
     size_t num_names = 0, names_capacity = 16;
     const char **names = malloc(names_capacity * sizeof *names);
     size_t num_edges = 0, edges_capacity = 64;
-    struct edge { const char *v[2]; } *edges
-	= malloc(edges_capacity * sizeof *edges);
+    struct edge { const char *v[2]; } *edges = malloc(edges_capacity * sizeof *edges);
 
     while (get_line(&line, &line_capacity, stream))
     {
-    	line_num++;
+    	++line_num;
     	// Special hack for Sebastian's graph format.
     	if (strncmp("# Graph Name", line, strlen("# Graph Name")) == 0)
         {
     	    do
             {
         		get_line(&line, &line_capacity, stream);
-        		line_num++;
+        		++line_num;
     	    } while (strncmp("# Edges", line, strlen("# Edges")) != 0);
     	    continue;
     	}
@@ -384,17 +384,21 @@ struct graph *graph_read(FILE *stream, const char ***vertex_names)
 
     struct graph *g = graph_make(num_names);
 
-    for (size_t i = 0; i < num_edges; i++)
+    fprintf(stdout, "Vertex indices:\n");
+
+    for (size_t i = 0; i < num_edges; ++i)
     {
     	vertex v[2];
-    	for (size_t j = 0; j < 2; j++)
+    	for (size_t j = 0; j < 2; ++j)
         {
     	    const char **p = bsearch(&edges[i].v[j], names, num_names,
     				     sizeof *names, pstrcmp);
     	    v[j] = p - names;
     	}
     	graph_connect(g, v[0], v[1]);
+        //fprintf(stdout, "%zd %zd\n", v[0], v[1]);
     }
+
     free(edges);
     *vertex_names = names;
 

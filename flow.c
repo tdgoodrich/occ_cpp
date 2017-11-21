@@ -70,6 +70,9 @@ void flow_clear(struct flow *flow)
 struct flow* flow_make(const struct graph *g)
 {
     struct flow* flow = calloc(sizeof (*flow) + g->size * sizeof *flow->flows, 1);
+    //struct flow* flow = (struct flow*) malloc(sizeof (*flow) + g->size * sizeof *flow->flows);
+    //memset(flow, 1, sizeof (*flow) + g->size * sizeof *flow->flows);
+
     flow->g = g;
 
     flow_clear(flow);
