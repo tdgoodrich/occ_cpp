@@ -26,7 +26,8 @@
 struct bitvec;
 struct flow;
 
-struct occ_problem {
+struct occ_problem
+{
     const struct graph *g;	// input graph
     struct graph *h;		// G' as described by Reed et al.
     const struct bitvec *occ;	// known odd cycle cover for g

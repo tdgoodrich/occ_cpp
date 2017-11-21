@@ -25,9 +25,8 @@
 struct bitvec* bitvec_make(size_t num_bits)
 {
     struct bitvec *v = calloc(sizeof (struct bitvec) + bitvec_bytes(num_bits), 1);
-
-    // struct bitvec *v = (struct bitvec *) malloc(sizeof (struct bitvec) + bitvec_bytes(num_bits));
-    // memset(v, 1, sizeof (struct bitvec) + bitvec_bytes(num_bits));
+    //struct bitvec *v = (struct bitvec *) malloc(sizeof (struct bitvec) + bitvec_bytes(num_bits));
+    //memset(v, 1, sizeof (struct bitvec) + bitvec_bytes(num_bits));
 
     v->num_bits = num_bits;
     return v;
@@ -92,7 +91,8 @@ size_t bitvec_count(const struct bitvec *v)
     return count;
 }
 
-static inline size_t min(size_t x, size_t y) {
+static inline size_t min(size_t x, size_t y)
+{
     return x < y ? x : y;
 }
 

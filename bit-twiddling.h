@@ -1,4 +1,4 @@
-/* occ -- find minimum odd cycle covers (Graph Bipartization)   
+/* occ -- find minimum odd cycle covers (Graph Bipartization)
    Copyright (C) 2006 Falk Hueffner
 
    This program is free software; you can redistribute it and/or
@@ -79,9 +79,9 @@ static inline unsigned popcountl(unsigned long x) {
     };
 
     return table[ x        & 0xff]
-	 + table[(x >>  8) & 0xff]
-	 + table[(x >> 16) & 0xff]
-	 + table[(x >> 24) & 0xff]
+	     + table[(x >>  8) & 0xff]
+	     + table[(x >> 16) & 0xff]
+	     + table[(x >> 24) & 0xff]
 #if LONG_BITS == 64
 	 + table[(x >> 32) & 0xff]
 	 + table[(x >> 40) & 0xff]

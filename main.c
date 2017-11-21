@@ -141,7 +141,7 @@ struct bitvec *find_occ(const struct graph *g)
 	    bitvec_set(sub, i);
 	    struct graph *g2 = graph_subgraph(g, sub);
 
-        // If this is already an OCT set, continue on
+        // // If this is already an OCT set, continue on
 	    if (occ_is_occ(g2, occ))
         {
 	        graph_free(g2);
