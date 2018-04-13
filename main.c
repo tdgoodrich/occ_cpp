@@ -43,7 +43,6 @@ void usage(FILE *stream) {
 	    "  -b  Enumerate valid partitions only for bipartite subgraphs\n"
 	    "  -g  Enumerate valid partitions by gray code\n"
 	    "  -v  Print progress to stderr\n"
-	    "  -s  Print only statistics\n"
 	    "  -h  Display this list of options\n"
 	);
 }
@@ -125,7 +124,7 @@ struct bitvec *find_hardcoded_occ(const struct graph *g)
 
 struct bitvec *find_occ(const struct graph *g)
 {
-    verbose = true;
+    verbose = false;
     struct bitvec *occ = NULL;
 
     occ = bitvec_make(g->size);
@@ -186,7 +185,6 @@ int main(int argc, char *argv[]) {
 	        case 'b': enum2col   = true; break;
 	        case 'g': use_gray   = true; break;
 	        case 'v': verbose    = true; break;
-	        case 's': stats_only = true; break;
 	        case 'h': usage(stdout); exit(0); break;
 	        default:  usage(stderr); exit(1); break;
 	    }
@@ -199,17 +197,11 @@ int main(int argc, char *argv[]) {
     struct bitvec *occ = find_occ(g);
 
     occ_size = bitvec_count(occ);
-    if (!stats_only)
-    {
-	    BITVEC_ITER(occ, v) puts(vertices[v]);
-    }
 
-    if (stats_only)
-    {
-	       printf("%5lu %6lu %5lu %10.2f %16llu\n",
-	       (unsigned long) g->size, (unsigned long) graph_num_edges(g),
-	       (unsigned long) occ_size, user_time(), augmentations);
-    }
+    printf("%5lu %6lu %5lu %10.2f %16llu\n",
+    (unsigned long) g->size, (unsigned long) graph_num_edges(g),
+    (unsigned long) occ_size, user_time(), augmentations);
+    BITVEC_ITER(occ, v) puts(vertices[v]);
 
     return 0;
 }
