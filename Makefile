@@ -60,7 +60,7 @@ depend: $(SOURCES)
 	$(CC) $(CFLAGS) -MM *.c > .depend
 
 run:
-	./occ < data/afro-americans/32.graph -s -b
+	./occ < data/afro-americans/32.graph -b
 
 
 include .depend
