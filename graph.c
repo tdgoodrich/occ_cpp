@@ -384,7 +384,7 @@ struct graph *graph_read(FILE *stream, const char ***vertex_names)
 
     struct graph *g = graph_make(num_names);
 
-    fprintf(stdout, "Vertex indices:\n");
+    // fprintf(stdout, "Vertex indices:\n");
 
     for (size_t i = 0; i < num_edges; ++i)
     {
