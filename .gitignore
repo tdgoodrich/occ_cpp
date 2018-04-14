@@ -1,3 +1,5 @@
 *.o
 occ
 .DS_Store
+.depend
+.ropeproject
