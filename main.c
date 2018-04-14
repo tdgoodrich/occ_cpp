@@ -34,11 +34,13 @@ int getopt(int argc, const char *argv[], const char *optstring);
 #include "graph.h"
 #include "occ.h"
 
+
 double user_time(void) {
     struct tms buf;
     times(&buf);
     return (double) buf.tms_utime / sysconf(_SC_CLK_TCK);
 }
+
 
 void usage(FILE *stream) {
     fprintf(stream,
@@ -60,12 +62,15 @@ unsigned long long augmentations = 0;
 struct bitvec *occ = NULL;
 const char **vertices;
 
+
 /* How to respond to a SIGTERM */
 void term(int signum)
 {
     /* TODO: A temp solution: Print the OCT set so far */
     BITVEC_ITER(occ, v) puts(vertices[v]);
+    exit(0);
 }
+
 
 void find_occ(const struct graph *g)
 {
@@ -119,7 +124,14 @@ void find_occ(const struct graph *g)
     }
 }
 
+
 int main(int argc, char *argv[]) {
+    /* Set up the SIGTERM handler */
+    struct sigaction action;
+    memset(&action, 0, sizeof(struct sigaction));
+    action.sa_handler = term;
+    sigaction(SIGTERM, &action, NULL);
+
     int c;
     while ((c = getopt(argc, argv, "bgvsh")) != -1)
     {
