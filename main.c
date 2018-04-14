@@ -27,6 +27,9 @@ int getopt(int argc, const char *argv[], const char *optstring);
 #include <unistd.h>
 #include <sys/times.h>
 
+/* Handle SIGTERM */
+#include <signal.h>
+
 #include "bitvec.h"
 #include "graph.h"
 #include "occ.h"
@@ -53,10 +56,20 @@ bool verbose    = false;
 bool stats_only = false;
 unsigned long long augmentations = 0;
 
-struct bitvec *find_occ(const struct graph *g)
+/* Move items printed by SIGTERM handler to be global vars */
+struct bitvec *occ = NULL;
+const char **vertices;
+
+/* How to respond to a SIGTERM */
+void term(int signum)
+{
+    /* TODO: A temp solution: Print the OCT set so far */
+    BITVEC_ITER(occ, v) puts(vertices[v]);
+}
+
+void find_occ(const struct graph *g)
 {
     verbose = false;
-    struct bitvec *occ = NULL;
 
     occ = bitvec_make(g->size);
     ALLOCA_BITVEC(sub, g->size);
@@ -104,7 +117,6 @@ struct bitvec *find_occ(const struct graph *g)
 	    }
 	    graph_free(g2);
     }
-    return occ;
 }
 
 int main(int argc, char *argv[]) {
@@ -121,11 +133,11 @@ int main(int argc, char *argv[]) {
 	    }
     }
 
-    const char **vertices;
     struct graph *g = graph_read(stdin, &vertices);
     size_t occ_size;
 
-    struct bitvec *occ = find_occ(g);
+    /* Populate global var occ with the OCT set */
+    find_occ(g);
 
     occ_size = bitvec_count(occ);
 
