@@ -81,17 +81,20 @@ void find_occ(const struct graph *g)
     occ = bitvec_make(g->size);
     ALLOCA_BITVEC(sub, g->size);
 
+    /* TODO: Start with our bipartite subgraph
 
-    /* sub should be the current subgraph and occ the current oct set.
-       We hardcode some preprocessing below: */
+    for vertex in heuristic_bipartite_nodes:
+                bitvec_set(sub, vertex);
+    */
 
+    /* TODO: go from i=0 to lookup_table size */
     for (size_t i = 0; i < g->size; ++i)
     {
         // Add i to the subgraph we're looking at
 	    bitvec_set(sub, i);
 	    struct graph *g2 = graph_subgraph(g, sub);
 
-        // // If this is already an OCT set, continue on
+        // If this is already an OCT set, continue on
 	    if (occ_is_occ(g2, occ))
         {
 	        graph_free(g2);
