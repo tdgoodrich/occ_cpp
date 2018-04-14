@@ -56,6 +56,8 @@ bool enum2col   = false;
 bool use_gray   = false;
 bool verbose    = false;
 bool stats_only = false;
+char *graph_filename;
+char *metadata_filename;
 unsigned long long augmentations = 0;
 
 /* Move items printed by SIGTERM handler to be global vars */
@@ -133,7 +135,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGTERM, &action, NULL);
 
     int c;
-    while ((c = getopt(argc, argv, "bgvsh")) != -1)
+    while ((c = getopt(argc, argv, "bgvshf:m:")) != -1)
     {
 	    switch (c)
         {
@@ -141,11 +143,18 @@ int main(int argc, char *argv[]) {
 	        case 'g': use_gray   = true; break;
 	        case 'v': verbose    = true; break;
 	        case 'h': usage(stdout); exit(0); break;
+            case 'f': graph_filename = optarg; break;
+            case 'm': metadata_filename = optarg; break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
 
-    struct graph *g = graph_read(stdin, &vertices);
+    FILE *graph_stream = fopen(graph_filename, "r");
+    struct graph *g = graph_read(graph_stream, &vertices);
+    fclose(graph_stream);
+
+    // FILE *metadata_stream = fopen(metadata_filename, 'r');
+    // fclose(metadata_stream);
     size_t occ_size;
 
     /* Populate global var occ with the OCT set */
