@@ -45,19 +45,19 @@ double user_time(void) {
 void usage(FILE *stream) {
     fprintf(stream,
 	    "occ: Calculate minimum odd cycle cover\n"
-	    "  -b  Enumerate valid partitions only for bipartite subgraphs\n"
-	    "  -g  Enumerate valid partitions by gray code\n"
 	    "  -v  Print progress to stderr\n"
+        "  -f  Compute OCT on this graph file"
 	    "  -h  Display this list of options\n"
 	);
 }
 
-bool enum2col   = false;
-bool use_gray   = false;
+/* Always use enum2col */
+bool enum2col   = true;
+bool use_gray   = true;
+
+/* The actual parameters */
 bool verbose    = false;
-bool stats_only = false;
 char *graph_filename;
-char *metadata_filename;
 unsigned long long augmentations = 0;
 
 /* Move items printed by SIGTERM handler to be global vars */
@@ -170,16 +170,13 @@ int main(int argc, char *argv[]) {
     sigaction(SIGTERM, &action, NULL);
 
     int c;
-    while ((c = getopt(argc, argv, "bgvshf:m:")) != -1)
+    while ((c = getopt(argc, argv, "vhf:")) != -1)
     {
 	    switch (c)
         {
-	        case 'b': enum2col   = true; break;
-	        case 'g': use_gray   = true; break;
 	        case 'v': verbose    = true; break;
 	        case 'h': usage(stdout); exit(0); break;
             case 'f': graph_filename = optarg; break;
-            case 'm': metadata_filename = optarg; break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
