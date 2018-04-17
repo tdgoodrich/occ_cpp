@@ -1,5 +1,5 @@
 CC	= gcc
-CFLAGS	= -std=c11 -O3 -g -W -Wall -posix
+CFLAGS	= -std=c11 -O3 -g -W -Wall -pthread
 # disable internal consistency checking for moderate (10-30%) speedup
 #CFLAGS  += -DNDEBUG
 
