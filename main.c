@@ -48,6 +48,7 @@ void usage(FILE *stream) {
 	    "  -v  Print progress to stderr\n"
         "  -f  Compute OCT on this graph file"
 	    "  -h  Display this list of options\n"
+        "  -p  Preprocessing level {0: None, 1: Bipartite, 2: Bipartite + Density Sort}"
 	);
 }
 
@@ -58,6 +59,7 @@ bool use_gray   = true;
 /* The actual parameters */
 bool verbose    = false;
 char *graph_filename;
+int preprocessing_level = 0;
 unsigned long long augmentations = 0;
 
 /* Move items printed by SIGTERM handler to be global vars */
@@ -170,13 +172,14 @@ int main(int argc, char *argv[]) {
     sigaction(SIGTERM, &action, NULL);
 
     int c;
-    while ((c = getopt(argc, argv, "vhf:")) != -1)
+    while ((c = getopt(argc, argv, "vhf:p:")) != -1)
     {
 	    switch (c)
         {
 	        case 'v': verbose    = true; break;
 	        case 'h': usage(stdout); exit(0); break;
             case 'f': graph_filename = optarg; break;
+            case 'p': preprocessing_level = optarg; break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
