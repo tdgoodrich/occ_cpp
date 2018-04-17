@@ -216,6 +216,10 @@ int main(int argc, char *argv[]) {
     }
 
     FILE *graph_stream = fopen(graph_filename, "r");
+    if (graph_stream == NULL) {
+        fprintf(stderr, "File '%s' could not be read.\n", graph_filename);
+        exit(1);
+    }
     g = graph_read(graph_stream, &vertices);
     fclose(graph_stream);
 
