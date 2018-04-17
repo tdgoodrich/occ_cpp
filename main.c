@@ -63,14 +63,43 @@ unsigned long long augmentations = 0;
 /* Move items printed by SIGTERM handler to be global vars */
 struct bitvec *occ = NULL;
 const char **vertices;
+struct graph *g;
+size_t current_node;
+size_t last_node_finished;
 
 
 /* How to respond to a SIGTERM */
 void term(int signum)
 {
-    /* TODO: A temp solution: Print the OCT set so far */
+
+    // Only handle sigterm
+    if (signum != SIGTERM) return;
+
+    // Print top line of statistics
+    // (n, m, OPT, run time (user), flow augmentations)
+    // TODO add unexplored vertices to OPT size
+    printf("%5lu %6lu %5lu %10.2f %16llu\n",
+           (unsigned long) g->size, (unsigned long) graph_num_edges(g),
+           (unsigned long) bitvec_count(occ), user_time(), augmentations);
+
+
+    // We now need to determine the vertices of g that have not been explored
+    // and add them to the OCT set. This is done by comparing the loop control
+    // variable current_node to the g->size.
+    // Because the outer loop iterates on range(0, g->size - 1) inclusive, this
+    // is trivial if current_node is equal to g->size because that means iteration
+    // has finished. In this case there are no unexplored vertices.
+    // Otherwise, we have race conditions.
+
+
+    /* TODO: Add all unexplored vertices to OCT */
+    // Print computed OCT set.
     BITVEC_ITER(occ, v) puts(vertices[v]);
+
+    // Now that stats have been printed, finish handling SIGTERM
+    // by exiting with success.
     exit(0);
+
 }
 
 
@@ -88,21 +117,23 @@ void find_occ(const struct graph *g)
     */
 
     /* TODO: go from i=0 to lookup_table size */
-    for (size_t i = 0; i < g->size; ++i)
+    last_node_finished = -1;
+    for (current_node = 0; current_node < g->size; ++current_node)
     {
         // Add i to the subgraph we're looking at
-	    bitvec_set(sub, i);
+	    bitvec_set(sub, current_node);
 	    struct graph *g2 = graph_subgraph(g, sub);
 
         // If this is already an OCT set, continue on
 	    if (occ_is_occ(g2, occ))
         {
+            last_node_finished = current_node;
 	        graph_free(g2);
 	        continue;
 	    }
 
         // Otherwise add i to the OCT set and compress
-	    bitvec_set(occ, i);
+	    bitvec_set(occ, current_node);
 	    if (verbose)
         {
 	        fprintf(stderr, "size = %3lu ", (unsigned long) graph_num_vertices(g2));
@@ -125,6 +156,7 @@ void find_occ(const struct graph *g)
 		        abort();
 	        }
 	    }
+        last_node_finished = current_node;
 	    graph_free(g2);
     }
 }
@@ -153,7 +185,7 @@ int main(int argc, char *argv[]) {
     }
 
     FILE *graph_stream = fopen(graph_filename, "r");
-    struct graph *g = graph_read(graph_stream, &vertices);
+    g = graph_read(graph_stream, &vertices);
     fclose(graph_stream);
 
     // FILE *metadata_stream = fopen(metadata_filename, 'r');
@@ -166,8 +198,8 @@ int main(int argc, char *argv[]) {
     occ_size = bitvec_count(occ);
 
     printf("%5lu %6lu %5lu %10.2f %16llu\n",
-    (unsigned long) g->size, (unsigned long) graph_num_edges(g),
-    (unsigned long) occ_size, user_time(), augmentations);
+           (unsigned long) g->size, (unsigned long) graph_num_edges(g),
+           (unsigned long) occ_size, user_time(), augmentations);
     BITVEC_ITER(occ, v) puts(vertices[v]);
 
     return 0;
