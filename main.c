@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #if defined (__SVR4) && defined (__sun)
 int getopt(int argc, const char *argv[], const char *optstring);
 #else
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]) {
 	        case 'v': verbose    = true; break;
 	        case 'h': usage(stdout); exit(0); break;
             case 'f': graph_filename = optarg; break;
-            case 'p': preprocessing_level = optarg; break;
+            case 'p': preprocessing_level = atoi(optarg); break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
