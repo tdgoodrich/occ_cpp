@@ -36,11 +36,11 @@ extern "C" {
     #include "bitvec.h"
     #include "graph.h"
     #include "occ.h"
-    #include "find_occ.h"
 }
 
 
 // Include CPP header files
+#include "find_occ.hpp"
 #include "heuristics/Ensemble.hpp"
 
 

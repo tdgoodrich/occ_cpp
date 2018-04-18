@@ -23,7 +23,6 @@ SOURCES	= \
 	occ-gray.c	\
 	occ.c		\
 	util.c	\
-	find_occ.c
 
 # Full compile command for C files. Use the C compiler with C
 # compile time flags.
@@ -44,6 +43,7 @@ CXX = clang++
 # C++ source files.
 CXX_SOURCES = \
 	main.cpp \
+	find_occ.cpp \
 	heuristics/heuristic_solver.cpp\
 	heuristics/Debug.cpp\
 	heuristics/Ensemble.cpp\

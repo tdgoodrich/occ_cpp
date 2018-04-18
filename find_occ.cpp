@@ -1,4 +1,4 @@
-#include "find_occ.h"
+#include "find_occ.hpp"
 
 bool enum2col   = true;
 bool use_gray   = true;
@@ -6,7 +6,8 @@ struct bitvec *occ = NULL;
 const char **vertices;
 unsigned long long augmentations = 0;
 struct graph *g;
-
+size_t last_node_finished;
+sigset_t signalset;
 
 double user_time(void) {
     struct tms buf;

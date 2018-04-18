@@ -7,9 +7,12 @@
 #include <unistd.h>
 #include <sys/times.h>
 #include <signal.h>
-#include "bitvec.h"
-#include "graph.h"
-#include "occ.h"
+
+extern "C" {
+    #include "bitvec.h"
+    #include "graph.h"
+    #include "occ.h"
+}
 
 
 /* Always use enum2col */
@@ -19,9 +22,6 @@ extern struct bitvec *occ;
 extern const char **vertices;
 extern unsigned long long augmentations;
 extern struct graph *g;
-
-size_t last_node_finished;
-sigset_t signalset;
 
 double user_time(void);
 void block();
