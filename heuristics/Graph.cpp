@@ -20,6 +20,12 @@ Graph::Graph(std::string filename)
     infile.close();
 }
 
+Graph::Graph(int num_vertices) {
+    this->num_vertices = num_vertices;
+    neighbors.resize(num_vertices);
+    vertices_active = std::vector<bool>(num_vertices, true);
+}
+
 void Graph::add_edge(int vertex_1, int vertex_2)
 {
     neighbors.at(vertex_1).insert(vertex_2);

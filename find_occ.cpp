@@ -68,7 +68,7 @@ void term(int signum)
 }
 
 
-void find_occ(const struct graph *g)
+void find_occ(const struct graph *g, int preprocessing)
 {
 
     /* Set up the SIGTERM handler */
@@ -79,7 +79,17 @@ void find_occ(const struct graph *g)
     action.sa_mask = signalset;
     sigaction(SIGTERM, &action, NULL);
 
-    // verbose = false;
+
+    // Determine which optimizations to use
+    bool run_heuristics = false;
+    bool density = false;
+    if (preprocessing == 1) {
+        run_heuristics = true;
+    }
+    if (preprocessing == 2) {
+        run_heuristics = true;
+        density = true;
+    }
 
     block();
         occ = bitvec_make(g->size);
@@ -87,11 +97,40 @@ void find_occ(const struct graph *g)
 
     ALLOCA_BITVEC(sub, g->size);
 
-    /* TODO: Start with our bipartite subgraph
+    // If we're running heuristics, compute an initial bipartite subgraph.
+    if (run_heuristics) {
 
-    for vertex in heuristic_bipartite_nodes:
-                bitvec_set(sub, vertex);
-    */
+        // Create a graph and heuristics ensemble
+        Graph heuristics_graph(g->size);
+        EnsembleSolver solver;
+
+        // Iterate over all vertices
+        for (int v = 0; v < g->size; v++) {
+
+            // Iterate over all neighbors of vertex v
+            for (int n = 0; n < g->vertices[v]->deg; n++) {
+
+                // Get the neighbor w
+                int w = g->vertices[v]->neighbors[n];
+
+                // If we haven't seen this neighbor yet, add
+                // the edge to the heuristics graph.
+                if (v < w) heuristics_graph.add_edge(v, w);
+
+            }
+        }
+
+        // Run heuristics
+        auto heuristic_result = solver.heuristic_solve(heuristics_graph, 250);
+        auto heuristic_subgraph = get<0>(heuristic_result);
+
+        // Add all the vertices from the heuristic subgraph to the
+        // subgraph used in iterative compression
+        for (auto v : heuristic_subgraph) {
+            bitvec_set(sub, v);
+        }
+
+    }
 
     /* TODO: go from i=0 to lookup_table size */
     last_node_finished = -1;
@@ -115,15 +154,6 @@ void find_occ(const struct graph *g)
             bitvec_set(occ, i);
             unblock();
         }
-
-        // Otherwise add i to the OCT set and compress
-	    // if (verbose)
-        // {
-	    //     fprintf(stderr, "size = %3lu ", (unsigned long) graph_num_vertices(g2));
-	    //     fprintf(stderr, "occ = ");
-	    //     bitvec_dump(occ);
-	    //     putc('\n', stderr);
-	    // }
 
 	    struct bitvec *occ_new = occ_shrink(g2, occ, enum2col, use_gray, true);
 

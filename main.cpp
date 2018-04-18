@@ -41,7 +41,6 @@ extern "C" {
 
 // Include CPP header files
 #include "find_occ.hpp"
-#include "heuristics/Ensemble.hpp"
 
 
 /* The actual parameters */
@@ -62,8 +61,6 @@ void usage(FILE *stream) {
 
 
 int main(int argc, char *argv[]) {
-
-    EnsembleSolver solver;
 
     int c;
     while ((c = getopt(argc, argv, "vhf:p:")) != -1)
@@ -89,7 +86,7 @@ int main(int argc, char *argv[]) {
     size_t occ_size;
 
     /* Populate global var occ with the OCT set */
-    find_occ(g);
+    find_occ(g, preprocessing_level);
 
     occ_size = bitvec_count(occ);
 

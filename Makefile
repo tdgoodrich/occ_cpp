@@ -44,7 +44,6 @@ CXX = clang++
 CXX_SOURCES = \
 	main.cpp \
 	find_occ.cpp \
-	heuristics/heuristic_solver.cpp\
 	heuristics/Debug.cpp\
 	heuristics/Ensemble.cpp\
 	heuristics/Graph.cpp\

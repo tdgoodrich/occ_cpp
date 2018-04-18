@@ -14,6 +14,9 @@ extern "C" {
     #include "occ.h"
 }
 
+#include "heuristics/Ensemble.hpp"
+#include "heuristics/Graph.hpp"
+
 
 /* Always use enum2col */
 extern bool enum2col;
@@ -27,6 +30,6 @@ double user_time(void);
 void block();
 void unblock();
 void term(int signum);
-void find_occ(const struct graph *g);
+void find_occ(const struct graph *g, int preprocessing);
 
 #endif

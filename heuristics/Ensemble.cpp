@@ -3,8 +3,8 @@
 
 /**
  * Run heuristics until reaching timeout. Then return the best result found
- * for each heuristic. Best result is reported as the smallest OCT, the
- * inverse of the result reported by the heuristic functions.
+ * for each heuristic. Best result is reported as the largest bipartite
+ * subgraph found by any solver.
  *
  * @param  timeout  Timeout in milliseconds.
  * @return          Tuple consisting of (oct size, seconds).
@@ -53,24 +53,7 @@ tuple<vector<int>, long> EnsembleSolver::heuristic_solve(Graph &graph, long time
 
     }
 
-    // OCT results
-    vector<int> oct, range;
-
-    // Create vector of all vertices
-    range.resize(graph.get_num_vertices());
-    iota(range.begin(), range.end(), 0);
-
-    // Sort best solutions
-    sort(best.begin(), best.end());
-
-    // Compute OCT
-    set_difference(
-        range.begin(), range.end(),
-        best.begin(), best.end(),
-        inserter(oct, oct.begin())
-    );
-
     // Return dictionary of results
-    return make_tuple(oct, totalTime);
+    return make_tuple(best, totalTime);
 
 }
