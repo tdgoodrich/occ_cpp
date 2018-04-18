@@ -24,7 +24,22 @@ CLINK	= $(CC) $(CFLAGS) $(LDPATH) $(LIBS)
 
 OBJS	= $(SOURCES:.c=.o)
 
-all: depend $(PROG)
+
+CPP_COMPILER = clang++
+HEURISTICS_FILES = \
+	heuristics/heuristic_solver.cpp\
+	heuristics/Debug.cpp\
+	heuristics/Ensemble.cpp\
+	heuristics/Graph.cpp\
+	heuristics/Heuristics.cpp
+CPP_VERSION = -std=c++14
+CPP_COMPILE_OPTIONS = -Wall -g -O3 -pthread
+HEURISTICS_OUTPUT = heuristic_solver
+
+all: heuristics_ensemble depend $(PROG)
+
+heuristics_ensemble:
+	$(CPP_COMPILER) $(CPP_VERSION) $(HEURISTICS_FILES) -o $(HEURISTICS_OUTPUT) $(CPP_COMPILE_OPTIONS)
 
 %.o: %.c
 	$(CCOMPILE) -c $<
@@ -33,7 +48,7 @@ $(PROG): $(OBJS)
 	$(CLINK) $(OBJS) -o $(PROG)
 
 clean:
-	rm -f $(PROG) $(OBJS) core gmon.out
+	rm -f $(PROG) $(OBJS) core gmon.out $(HEURISTICS_OUTPUT)
 
 VER	= 1.1
 

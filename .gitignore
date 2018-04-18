@@ -3,3 +3,5 @@ occ
 .DS_Store
 .depend
 .ropeproject
+*.dSYM/
+heuristic_solver
