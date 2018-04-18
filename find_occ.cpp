@@ -134,13 +134,61 @@ void find_occ(const struct graph *g, int preprocessing)
         auto heuristic_result = solver.heuristic_solve(heuristics_graph, 250);
         auto heuristic_subgraph = get<0>(heuristic_result);
 
-        // We save heuristic oct globally so it can be used elsewhere
+        // We save heuristic oct globally so it can be used by the SIGTERM handler
         heuristic_oct = get<1>(heuristic_result);
 
         // Add all the vertices from the heuristic subgraph to the
         // subgraph used in iterative compression
         for (auto v : heuristic_subgraph) {
             bitvec_set(sub, v);
+        }
+
+        // If we're using density, we want to order the vertices in
+        // the oct set so that we iterate over them correctly.
+        if (density) {
+
+            // Iterate over all the indices of heuristic_oct
+            for (int i = 0; i < heuristic_oct.size(); i++){
+
+                // Find the index of the vertex after the current index
+                // that has the largest number of edges into the
+                // heuristic bipartite graph or into a part of the OCT
+                // set already considered.
+                int max_value = -1;
+                int max_idx = -1;
+                for (int j = i; j < heuristic_oct.size(); j++) {
+
+                    // Number of edges
+                    int num_edges = 0;
+
+                    // Get the current vertex under consideration
+                    int v = heuristic_oct[i];
+
+                    // Count the number of edges to the subgraph
+                    for (auto w : heuristic_subgraph) {
+                        if (heuristics_graph.has_edge(v, w)) num_edges++;
+                    }
+
+                    // Count the number of edges to the previously considered veertices
+                    for (int k = 0; k < j; k++) {
+                        if (k != j && heuristics_graph.has_edge(v, heuristic_oct[i])) num_edges++;
+                    }
+
+                    // If this vertex has more edges than the max, update
+                    if (num_edges > max_value) {
+                        max_value = num_edges;
+                        max_idx = j;
+                    }
+
+                }
+
+                // Swap the values
+                int tmp = heuristic_oct[i];
+                heuristic_oct[i] = heuristic_oct[max_idx];
+                heuristic_oct[max_idx] = tmp;
+
+            }
+
         }
 
     }
