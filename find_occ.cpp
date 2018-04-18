@@ -171,7 +171,7 @@ void find_occ(const struct graph *g, int preprocessing)
 
                     // Count the number of edges to the previously considered veertices
                     for (int k = 0; k < j; k++) {
-                        if (k != j && heuristics_graph.has_edge(v, heuristic_oct[i])) num_edges++;
+                        if (heuristics_graph.has_edge(v, heuristic_oct[i])) num_edges++;
                     }
 
                     // If this vertex has more edges than the max, update
