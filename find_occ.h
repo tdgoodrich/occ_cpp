@@ -11,9 +11,6 @@
 #include "graph.h"
 #include "occ.h"
 
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
 
 /* Always use enum2col */
 extern bool enum2col;
@@ -31,9 +28,5 @@ void block();
 void unblock();
 void term(int signum);
 void find_occ(const struct graph *g);
-
-// #ifdef __cplusplus
-// }
-// #endif
 
 #endif
