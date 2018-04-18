@@ -36,9 +36,9 @@ struct graph {
     size_t size;
     struct vertex {
         /* This used to be vertex, not int */
-	    vertex capacity;
-	    vertex deg;
-	    vertex neighbors[];
+	    size_t capacity;
+	    size_t deg;
+	    size_t neighbors[];
     } *vertices[];
 };
 

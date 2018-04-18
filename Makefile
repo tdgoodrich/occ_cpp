@@ -1,81 +1,51 @@
 CC	= gcc
 CFLAGS	= -std=c11 -O3 -g -W -Wall -pthread -D_POSIX_SOURCE
-# disable internal consistency checking for moderate (10-30%) speedup
-#CFLAGS  += -DNDEBUG
-
-PROG	= occ
-
-LDPATH	=
-LIBS	=
-
 SOURCES	= \
 	bitvec.c	\
 	flow.c		\
 	graph.c		\
-	main.c		\
 	occ-enum2col.c	\
 	occ-gray.c	\
 	occ.c		\
-	util.c
-
-
+	util.c	\
+	find_occ.c
 CCOMPILE = $(CC) $(CFLAGS)
-CLINK	= $(CC) $(CFLAGS) $(LDPATH) $(LIBS)
-
 OBJS	= $(SOURCES:.c=.o)
 
 
 CPP_COMPILER = clang++
-HEURISTICS_FILES = \
+CPP_FILES = \
+	main.cpp \
 	heuristics/heuristic_solver.cpp\
 	heuristics/Debug.cpp\
 	heuristics/Ensemble.cpp\
 	heuristics/Graph.cpp\
 	heuristics/Heuristics.cpp
+CPP_OBJS = $(CPP_FILES:.cpp=.o)
 CPP_VERSION = -std=c++14
 CPP_COMPILE_OPTIONS = -Wall -g -O3 -pthread
-HEURISTICS_OUTPUT = heuristic_solver
 
-all: heuristics_ensemble depend $(PROG)
+CLINK	= $(CPP_COMPILER) $(CPP_VERSION) $(CPP_COMPILE_OPTIONS)
+PROG	= occ
 
-heuristics_ensemble:
-	$(CPP_COMPILER) $(CPP_VERSION) $(HEURISTICS_FILES) -o $(HEURISTICS_OUTPUT) $(CPP_COMPILE_OPTIONS)
+VER	= 1.1
+
+all: depend $(PROG)
+
+$(PROG): $(OBJS) $(CPP_OBJS)
+	$(CLINK) $(OBJS) $(CPP_OBJS) -o $(PROG)
+
+include .depend
+.depend: depend
+depend: $(SOURCES)
+	$(CC) $(CFLAGS) -MM *.c > .depend
+	$(CPP_COMPILER) $(CPP_VERSION) -MM $(CPP_FILES) >> .depend
 
 %.o: %.c
 	$(CCOMPILE) -c $<
 
-$(PROG): $(OBJS)
-	$(CLINK) $(OBJS) -o $(PROG)
+%.o: %.cpp
+	$(CPP_COMPILER) $(CPP_VERSION) -c $< -o $@
 
 clean:
-	rm -f $(PROG) $(OBJS) core gmon.out $(HEURISTICS_OUTPUT)
-
-VER	= 1.1
-
-dist: all
-	rm -rf occ-$(VER)
-	mkdir occ-$(VER)
-	cp COPYING README occ-$(VER)
-	cp Makefile *.c *.h occ-$(VER)
-	mkdir -p occ-$(VER)/data/japanese
-	mkdir -p occ-$(VER)/data/afro-americans
-	cp data/japanese/*.graph occ-$(VER)/data/japanese
-	cp data/afro-americans/*.graph occ-$(VER)/data/afro-americans
-	mkdir occ-$(VER)/synth-data
-	cp synth-data/*.ml synth-data/*.mli synth-data/Makefile occ-$(VER)/synth-data
-	GZIP=--best tar -cvvzf occ-$(VER).tar.gz occ-$(VER)
-	cp occ-lp.py occ-$(VER)
-
-realclean: clean
-	rm -f *~ *.bak
-
-.depend: depend
-
-depend: $(SOURCES)
-	$(CC) $(CFLAGS) -MM *.c > .depend
-
-run:
-	./occ < data/afro-americans/32.graph -b
-
-
-include .depend
+	rm -f $(PROG) $(OBJS) $(CPP_OBJS) core gmon.out .depend
