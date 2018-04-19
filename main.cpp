@@ -56,14 +56,17 @@ void usage(FILE *stream) {
         "  -f  Compute OCT on this graph file"
 	    "  -h  Display this list of options\n"
         "  -p  Preprocessing level {0: None, 1: Bipartite, 2: Bipartite + Density Sort}\n"
+        "  -s  Seed for shuffling heuristic oct. Must be nonzero. No shuffle if not specified.\n"
 	);
 }
 
 
 int main(int argc, char *argv[]) {
 
+    int shuffle = 0;
+
     int c;
-    while ((c = getopt(argc, argv, "vhf:p:")) != -1)
+    while ((c = getopt(argc, argv, "vhf:p:s:")) != -1)
     {
 	    switch (c)
         {
@@ -71,6 +74,7 @@ int main(int argc, char *argv[]) {
 	        case 'h': usage(stdout); exit(0); break;
             case 'f': graph_filename = optarg; break;
             case 'p': preprocessing_level = atoi(optarg); break;
+            case 's': shuffle = atoi(optarg); break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
@@ -86,7 +90,7 @@ int main(int argc, char *argv[]) {
     size_t occ_size;
 
     /* Populate global var occ with the OCT set */
-    find_occ(g, preprocessing_level);
+    find_occ(g, preprocessing_level, shuffle);
 
     occ_size = bitvec_count(occ);
 

@@ -80,7 +80,7 @@ void term(int signum)
 }
 
 
-void find_occ(const struct graph *g, int preprocessing)
+void find_occ(const struct graph *g, int preprocessing, int shuffle)
 {
 
     /* Set up the SIGTERM handler */
@@ -189,6 +189,13 @@ void find_occ(const struct graph *g, int preprocessing)
 
             }
 
+        }
+        else {
+            // If we have shuffling turned on, shuffle the oct set here.
+            if (shuffle) {
+                unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+                std::shuffle(heuristic_oct.begin(), heuristic_oct.end(), std::default_random_engine(seed));
+            }
         }
 
     }

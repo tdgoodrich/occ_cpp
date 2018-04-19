@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <sys/times.h>
 #include <signal.h>
+#include <vector>
+#include <chrono>
+#include <random>
 
 extern "C" {
     #include "bitvec.h"
@@ -30,6 +33,6 @@ double user_time(void);
 void block();
 void unblock();
 void term(int signum);
-void find_occ(const struct graph *g, int preprocessing);
+void find_occ(const struct graph *g, int preprocessing, int shuffle);
 
 #endif
