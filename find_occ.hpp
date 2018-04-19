@@ -33,6 +33,6 @@ double user_time(void);
 void block();
 void unblock();
 void term(int signum);
-void find_occ(const struct graph *g, int preprocessing, int seed);
+void find_occ(const struct graph *g, int preprocessing, int seed, long htime);
 
 #endif

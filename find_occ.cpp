@@ -80,7 +80,7 @@ void term(int signum)
 }
 
 
-void find_occ(const struct graph *g, int preprocessing, int seed)
+void find_occ(const struct graph *g, int preprocessing, int seed, long htime)
 {
 
     /* Set up the SIGTERM handler */
@@ -131,7 +131,7 @@ void find_occ(const struct graph *g, int preprocessing, int seed)
         }
 
         // Run heuristics
-        auto heuristic_result = solver.heuristic_solve(heuristics_graph, 250, seed);
+        auto heuristic_result = solver.heuristic_solve(heuristics_graph, htime, seed);
         auto heuristic_subgraph = get<0>(heuristic_result);
 
         // We save heuristic oct globally so it can be used by the SIGTERM handler
