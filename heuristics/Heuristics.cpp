@@ -1,25 +1,11 @@
 #include "Heuristics.hpp"
 
-std::vector<int> max_greedy_bipartite(Graph &graph, int num_seeds)
-{
-
-    std::vector<int> best;
-
-    for (int seed = 0; seed < num_seeds; ++seed)
-    {
-        std::vector<int> result = greedy_bipartite(graph, seed);
-        if (result.size() > best.size()) best = result;
-    }
-
-    return best;
-
-}
 
 /* Computes two independent sets and returns their union
    Uses min_degree_ind_set */
-std::vector<int> greedy_bipartite(Graph &graph, int seed)
+std::vector<int> greedy_bipartite(Graph &graph, std::default_random_engine &gen)
 {
-    srand(seed);
+
     /* Create two copy graphs to use and two independent set vectors */
     std::vector<int> ind_set1;
     std::vector<int> ind_set2;
@@ -27,7 +13,7 @@ std::vector<int> greedy_bipartite(Graph &graph, int seed)
     Graph graph2 = graph;
 
     /* Construct the first independent set */
-    ind_set1 = min_degree_ind_set(graph1);
+    ind_set1 = min_degree_ind_set(graph1, gen);
 
     /* Remove the first independent set from the second graph */
 
@@ -37,14 +23,14 @@ std::vector<int> greedy_bipartite(Graph &graph, int seed)
     }
 
     /* Construct the second independent set */
-    ind_set2 = min_degree_ind_set(graph2);
+    ind_set2 = min_degree_ind_set(graph2, gen);
 
     ind_set1.insert(ind_set1.begin(), ind_set2.begin(), ind_set2.end());
     return ind_set1;
 }
 
 /* Computes one ind set by iteratively choosing a min degree vertex */
-std::vector<int> min_degree_ind_set(Graph &graph)
+std::vector<int> min_degree_ind_set(Graph &graph, std::default_random_engine &gen)
 {
     std::vector<int> result;
 
@@ -62,7 +48,7 @@ std::vector<int> min_degree_ind_set(Graph &graph)
 
         /* Choose a random min degree vertex */
         auto min_degree_vertices = graph.get_min_degree_vertices();
-        int random_index = rand() % min_degree_vertices.size();
+        int random_index = gen() % min_degree_vertices.size();
         int chosen_vertex = min_degree_vertices[random_index];
 
         /* Remove this vertex and its neighbors */
@@ -84,25 +70,11 @@ std::vector<int> min_degree_ind_set(Graph &graph)
 }
 
 
-std::vector<int> max_greedy_stochastic(Graph &graph, int seeds) {
-
-    std::vector<int> best;
-
-    for (int i = 0; i < seeds; ++i) {
-        std::vector<int> result = greedy_stochastic(graph, i);
-        if (result.size() > best.size()) best = result;
-    }
-
-    return best;
-
-}
-
-
 /* Computes two independent sets and returns their union
    Uses luby_ind_set
 */
-std::vector<int> greedy_stochastic(Graph &graph, int seed) {
-    srand(seed);
+std::vector<int> greedy_stochastic(Graph &graph, std::default_random_engine &gen) {
+
     /* Create two copy graphs to use and two independent set vectors */
     Graph graph1 = graph;
     Graph graph2 = graph;
@@ -114,7 +86,7 @@ std::vector<int> greedy_stochastic(Graph &graph, int seed) {
     // ind_set2.resize(graph.get_num_vertices());
 
     /* Construct the first independent set */
-    luby_ind_set(graph1, ind_set1);
+    luby_ind_set(graph1, ind_set1, gen);
 
     /* Remove the first independent set from the second graph */
     for (std::vector<int>::iterator it = ind_set1.begin(); \
@@ -122,7 +94,7 @@ std::vector<int> greedy_stochastic(Graph &graph, int seed) {
         graph2.remove_vertex(*it);
      }
     /* Construct the second independent set */
-    luby_ind_set(graph2, ind_set2);
+    luby_ind_set(graph2, ind_set2, gen);
 
     // Concat independent sets and return
     ind_set1.insert(ind_set1.begin(), ind_set2.begin(), ind_set2.end());
@@ -130,7 +102,7 @@ std::vector<int> greedy_stochastic(Graph &graph, int seed) {
 
 }
 
-void luby_ind_set(Graph &graph, std::vector<int> &result) {
+void luby_ind_set(Graph &graph, std::vector<int> &result, std::default_random_engine &gen) {
     // S = new set
     // S' = new set
     // for vertex in vertices:
@@ -166,7 +138,7 @@ void luby_ind_set(Graph &graph, std::vector<int> &result) {
         {
             // Add vertex if it has no neighbors, or otherwise with probability 1 / (2 * degree(vertex))
             if (graph.get_degree(*vertex) == 0 ||
-                (double) rand() / (RAND_MAX) <= 1.0 / (2 * graph.get_degree(*vertex)))
+                (double) gen() / (RAND_MAX) <= 1.0 / (2 * graph.get_degree(*vertex)))
             {
                 initial_chosen_vertices.insert(*vertex);
                 //fprintf(stderr, "Selecting vertex %d\n", *vertex);
@@ -228,10 +200,7 @@ void luby_ind_set(Graph &graph, std::vector<int> &result) {
  * @param  seed                 Random seed.
  * @return                      List of vertices in not in OCT.
  */
-std::vector<int> greedy_dfs_bipartite(Graph &input_graph, int seed) {
-
-    // Seed rand
-    srand(seed);
+std::vector<int> greedy_dfs_bipartite(Graph &input_graph, std::default_random_engine &gen) {
 
     // Copy graph for private modification
     Graph graph(input_graph);
@@ -249,7 +218,7 @@ std::vector<int> greedy_dfs_bipartite(Graph &input_graph, int seed) {
     while (not_visited.size()) {
 
         // Get random index into not visited set
-        long idx = rand() % not_visited.size();
+        long idx = gen() % not_visited.size();
 
         // Create iterator and advance it
         auto iterator = not_visited.begin();
@@ -328,10 +297,7 @@ std::vector<int> greedy_dfs_bipartite(Graph &input_graph, int seed) {
  * @param  seed                 Random seed.
  * @return                      List of vertices not in OCT.
  */
-std::vector<int> greedy_bfs_bipartite(Graph &input_graph, int seed) {
-
-    // Seed rand
-    srand(seed);
+std::vector<int> greedy_bfs_bipartite(Graph &input_graph, std::default_random_engine &gen) {
 
     // Copy graph for private modification
     Graph graph(input_graph);
@@ -349,7 +315,7 @@ std::vector<int> greedy_bfs_bipartite(Graph &input_graph, int seed) {
     while (not_visited.size()) {
 
         // Get random index into not visited set
-        long idx = rand() % not_visited.size();
+        long idx = gen() % not_visited.size();
 
         // Create iterator and advance it
         auto iterator = not_visited.begin();

@@ -15,13 +15,11 @@
 #include "Debug.hpp"
 #include "Graph.hpp"
 
-std::vector<int> max_greedy_bipartite(Graph &graph, int num_seeds);
-std::vector<int> greedy_bipartite(Graph &graph, int seed);
-std::vector<int> min_degree_ind_set(Graph &graph);
-std::vector<int> max_greedy_stochastic(Graph &graph, int seeds);
-std::vector<int> greedy_stochastic(Graph &graph, int seed);
-void luby_ind_set(Graph &graph, std::vector<int> &result);
-std::vector<int> greedy_dfs_bipartite(Graph &graph, int seed);
-std::vector<int> greedy_bfs_bipartite(Graph &graph, int seed);
+std::vector<int> greedy_bipartite(Graph &graph, std::default_random_engine &gen);
+std::vector<int> min_degree_ind_set(Graph &graph, std::default_random_engine &gen);
+std::vector<int> greedy_stochastic(Graph &graph, std::default_random_engine &gen);
+void luby_ind_set(Graph &graph, std::vector<int> &result, std::default_random_engine &gen);
+std::vector<int> greedy_dfs_bipartite(Graph &graph, std::default_random_engine &gen);
+std::vector<int> greedy_bfs_bipartite(Graph &graph, std::default_random_engine &gen);
 
 #endif

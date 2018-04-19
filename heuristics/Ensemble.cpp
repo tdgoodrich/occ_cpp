@@ -9,11 +9,11 @@
  * @param  timeout  Timeout in milliseconds.
  * @return          Tuple consisting of (best, oct, seconds).
  */
-tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &graph, long timeout)
+tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &graph, long timeout, int seed)
 {
 
     // List of solvers
-    vector<vector<int> (*)(Graph &, int)> solvers = {
+    vector<vector<int> (*)(Graph &, std::default_random_engine &)> solvers = {
         greedy_bipartite,
         greedy_stochastic,
         greedy_bfs_bipartite,
@@ -23,12 +23,12 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &gra
     // Starting index
     int idx = 0;
 
-    // Start seed at 0
-    long seed = 0;
-
     // Initialize results
     vector<int> best;
     long totalTime;
+
+    // Create a mercenne twster rand generator
+    std::default_random_engine gen(seed);
 
     // Time
     const auto start = Clock::now();
@@ -37,7 +37,7 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &gra
     while (chrono::duration_cast<chrono::milliseconds>(Clock::now() - start).count() < timeout) {
 
         // Compute greedy bipartite
-        auto result = solvers[idx](graph, seed);
+        auto result = solvers[idx](graph, gen);
 
         // Record results, and get the current time
         if (result.size() > best.size()) {
@@ -47,9 +47,6 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &gra
 
         // Increment solver index
         idx = (idx + 1) % solvers.size();
-
-        // Increment seed
-        seed++;
 
     }
 

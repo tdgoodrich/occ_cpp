@@ -25,7 +25,7 @@ typedef chrono::high_resolution_clock Clock;
 class EnsembleSolver {
 
     public:
-        tuple<vector<int>, vector<int>, long> heuristic_solve(Graph &, long);
+        tuple<vector<int>, vector<int>, long> heuristic_solve(Graph &, long, int);
 
 };
 
