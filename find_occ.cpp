@@ -11,7 +11,7 @@ size_t last_index_finished = -1;
 sigset_t signalset;
 bool run_heuristics = false;
 bool density = false;
-vector<int> heuristic_oct;
+vector<int> remaining_vertices;
 
 double user_time(void) {
     struct tms buf;
@@ -54,7 +54,7 @@ void term(int signum)
         (unsigned long) g->size,
         (unsigned long) graph_num_edges(g),
         (unsigned long) bitvec_count(occ) +
-            (run_heuristics ? heuristic_oct.size() : g->size) - last_index_finished - 1,
+            (run_heuristics ? remaining_vertices.size() : g->size) - last_index_finished - 1,
         user_time(),
         augmentations
     );
@@ -65,8 +65,8 @@ void term(int signum)
     // Print all vertices that have not been explored. We consider these
     // as part of the OCT set.
     if (run_heuristics) {
-        for (size_t i = last_index_finished + 1; i < heuristic_oct.size(); i++) {
-             printf("%s\n", vertices[heuristic_oct[i]]);
+        for (size_t i = last_index_finished + 1; i < remaining_vertices.size(); i++) {
+             printf("%s\n", vertices[remaining_vertices[i]]);
         }
     }
     else {
@@ -80,7 +80,7 @@ void term(int signum)
 }
 
 
-void find_occ(const struct graph *g, int preprocessing, int shuffle)
+void find_occ(const struct graph *g, int preprocessing, int seed)
 {
 
     /* Set up the SIGTERM handler */
@@ -135,7 +135,7 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
         auto heuristic_subgraph = get<0>(heuristic_result);
 
         // We save heuristic oct globally so it can be used by the SIGTERM handler
-        heuristic_oct = get<1>(heuristic_result);
+        remaining_vertices = get<1>(heuristic_result);
 
         // Add all the vertices from the heuristic subgraph to the
         // subgraph used in iterative compression
@@ -147,8 +147,8 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
         // the oct set so that we iterate over them correctly.
         if (density) {
 
-            // Iterate over all the indices of heuristic_oct
-            for (int i = 0; i < heuristic_oct.size(); i++){
+            // Iterate over all the indices of remaining_vertices
+            for (int i = 0; i < remaining_vertices.size(); i++){
 
                 // Find the index of the vertex after the current index
                 // that has the largest number of edges into the
@@ -156,13 +156,13 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
                 // set already considered.
                 int max_value = -1;
                 int max_idx = -1;
-                for (int j = i; j < heuristic_oct.size(); j++) {
+                for (int j = i; j < remaining_vertices.size(); j++) {
 
                     // Number of edges
                     int num_edges = 0;
 
                     // Get the current vertex under consideration
-                    int v = heuristic_oct[j];
+                    int v = remaining_vertices[j];
 
                     // Count the number of edges to the subgraph
                     for (auto w : heuristic_subgraph) {
@@ -171,7 +171,7 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
 
                     // Count the number of edges to the previously considered vertices
                     for (int k = 0; k < i; k++) {
-                        if (heuristics_graph.has_edge(v, heuristic_oct[k])) num_edges++;
+                        if (heuristics_graph.has_edge(v, remaining_vertices[k])) num_edges++;
                     }
 
                     // If this vertex has more edges than the max, update
@@ -183,40 +183,32 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
                 }
 
                 // Swap the values
-                int tmp = heuristic_oct[i];
-                heuristic_oct[i] = heuristic_oct[max_idx];
-                heuristic_oct[max_idx] = tmp;
+                int tmp = remaining_vertices[i];
+                remaining_vertices[i] = remaining_vertices[max_idx];
+                remaining_vertices[max_idx] = tmp;
 
             }
 
-        }
-        else {
-            // If we have shuffling turned on, shuffle the oct set here.
-            if (shuffle) {
-                unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-                std::shuffle(heuristic_oct.begin(), heuristic_oct.end(), std::default_random_engine(seed));
-            }
         }
 
     }
+    else {
+        remaining_vertices.resize(g->size);
+        iota(remaining_vertices.begin(), remaining_vertices.end(), 0);
+    }
+
+    // If we're not using density sorting, then fill the OCT with
+    // all vertices in the graph.
+    if (!density) {
+        std::shuffle(remaining_vertices.begin(), remaining_vertices.end(), std::default_random_engine(seed));
+    }
 
     // Start compression
-    size_t size = run_heuristics ? heuristic_oct.size() : g->size;
-    for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < remaining_vertices.size(); ++i)
     {
 
-        // If we're using heuristics, then we iterate through the
-        // indices of the heuristic oct and the vertex is the
-        // vertex stored at that index. Otherwise we're just
-        // iterating through the graph vertices in order and the
-        // vertex is just i.
-        int v;
-        if (run_heuristics) {
-            v = heuristic_oct[i];
-        }
-        else {
-            v = i;
-        }
+        // Look up vertex
+        int v = remaining_vertices[i];
 
         // Add v to the subgraph we're looking at
 	    bitvec_set(sub, v);

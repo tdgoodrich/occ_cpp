@@ -63,7 +63,7 @@ void usage(FILE *stream) {
 
 int main(int argc, char *argv[]) {
 
-    int shuffle = 0;
+    int seed = 0;
 
     int c;
     while ((c = getopt(argc, argv, "vhf:p:s:")) != -1)
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	        case 'h': usage(stdout); exit(0); break;
             case 'f': graph_filename = optarg; break;
             case 'p': preprocessing_level = atoi(optarg); break;
-            case 's': shuffle = atoi(optarg); break;
+            case 's': seed = atoi(optarg); break;
 	        default:  usage(stderr); exit(1); break;
 	    }
     }
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     size_t occ_size;
 
     /* Populate global var occ with the OCT set */
-    find_occ(g, preprocessing_level, shuffle);
+    find_occ(g, preprocessing_level, seed);
 
     occ_size = bitvec_count(occ);
 
