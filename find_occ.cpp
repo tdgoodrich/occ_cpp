@@ -162,16 +162,16 @@ void find_occ(const struct graph *g, int preprocessing, int shuffle)
                     int num_edges = 0;
 
                     // Get the current vertex under consideration
-                    int v = heuristic_oct[i];
+                    int v = heuristic_oct[j];
 
                     // Count the number of edges to the subgraph
                     for (auto w : heuristic_subgraph) {
                         if (heuristics_graph.has_edge(v, w)) num_edges++;
                     }
 
-                    // Count the number of edges to the previously considered veertices
-                    for (int k = 0; k < j; k++) {
-                        if (heuristics_graph.has_edge(v, heuristic_oct[i])) num_edges++;
+                    // Count the number of edges to the previously considered vertices
+                    for (int k = 0; k < i; k++) {
+                        if (heuristics_graph.has_edge(v, heuristic_oct[k])) num_edges++;
                     }
 
                     // If this vertex has more edges than the max, update
