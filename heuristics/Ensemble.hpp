@@ -5,6 +5,7 @@
 // Includes
 #include <chrono>
 #include <iostream>
+#include <signal.h>
 #include <tuple>
 #include <vector>
 #include "Graph.hpp"
@@ -25,7 +26,7 @@ typedef chrono::high_resolution_clock Clock;
 class EnsembleSolver {
 
     public:
-        tuple<vector<int>, vector<int>, long> heuristic_solve(Graph &, long, int);
+        tuple<vector<int>, vector<int>, long> heuristic_solve(Graph &, volatile sig_atomic_t &, long, int);
 
 };
 

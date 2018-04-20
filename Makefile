@@ -8,7 +8,7 @@ PROG	= occ
 ######################
 
 # Use gcc as the compiler for regular c code
-CC	= gcc
+CC	= clang
 
 # C compile time flags. Use C11 with optimization. Warn all.
 # Include the pthreads library and posix source for signal handling.
@@ -44,6 +44,7 @@ CXX = clang++
 CXX_SOURCES = \
 	main.cpp \
 	find_occ.cpp \
+	signals.cpp \
 	heuristics/Debug.cpp\
 	heuristics/Ensemble.cpp\
 	heuristics/Graph.cpp\

@@ -87,7 +87,7 @@ bool occ_is_occ(const struct graph *g, const struct bitvec *occ)
 
 struct bitvec *occ_shrink(const struct graph *g, const struct bitvec *occ,
 			  bool enum2col, bool use_graycode,
-			  bool last_not_in_occ)
+			  bool last_not_in_occ, volatile sig_atomic_t *interrupt)
 {
     assert(occ_is_occ(g, occ));
     assert(graph_size(g) == bitvec_size(occ));
@@ -134,6 +134,7 @@ struct bitvec *occ_shrink(const struct graph *g, const struct bitvec *occ,
     	.last_not_in_occ = last_not_in_occ,
     	.occ_size        = occ_size,
     	.first_clone	 = graph_size(g),
+        .interrupt       = interrupt
     };
 
     occ_construct_h(problem);

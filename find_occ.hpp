@@ -6,7 +6,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/times.h>
-#include <signal.h>
 #include <vector>
 #include <chrono>
 #include <random>
@@ -17,6 +16,7 @@ extern "C" {
     #include "occ.h"
 }
 
+#include "signals.hpp"
 #include "heuristics/Ensemble.hpp"
 #include "heuristics/Graph.hpp"
 
@@ -30,9 +30,6 @@ extern unsigned long long augmentations;
 extern struct graph *g;
 
 double user_time(void);
-void block();
-void unblock();
-void term(int signum);
 void find_occ(const struct graph *g, int preprocessing, int seed, long htime);
 
 #endif

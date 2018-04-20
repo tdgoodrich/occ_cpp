@@ -41,6 +41,7 @@ extern "C" {
 
 // Include CPP header files
 #include "find_occ.hpp"
+#include "signals.hpp"
 
 
 /* The actual parameters */
@@ -63,6 +64,9 @@ void usage(FILE *stream) {
 
 
 int main(int argc, char *argv[]) {
+
+    // Initialize signals
+    init_signal_handler();
 
     int seed = 0;
     long htime = 250;
@@ -90,18 +94,8 @@ int main(int argc, char *argv[]) {
     g = graph_read(graph_stream, &vertices);
     fclose(graph_stream);
 
-    size_t occ_size;
-
-    /* Populate global var occ with the OCT set */
+    /* Find OCT and return */
     find_occ(g, preprocessing_level, seed, htime);
-
-    occ_size = bitvec_count(occ);
-
-    printf("%5lu %6lu %5lu %10.2f %16llu\n",
-           (unsigned long) g->size, (unsigned long) graph_num_edges(g),
-           (unsigned long) occ_size, user_time(), augmentations);
-    BITVEC_ITER(occ, v) puts(vertices[v]);
-
     return 0;
 
 }

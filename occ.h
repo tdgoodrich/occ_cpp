@@ -20,7 +20,7 @@
 #define OCC_H
 
 #include <stdbool.h>
-
+#include <signal.h>
 #include "graph.h"
 
 struct bitvec;
@@ -39,11 +39,12 @@ struct occ_problem
     bool use_graycode;
     bool last_not_in_occ;
     size_t occ_size, first_clone;
+    volatile sig_atomic_t *interrupt;
 };
 
 bool occ_is_occ(const struct graph *g, const struct bitvec *occ);
 struct bitvec *occ_shrink(const struct graph *g, const struct bitvec *occ,
-    bool enum2col, bool use_graycode, bool last_not_in_occ);
+    bool enum2col, bool use_graycode, bool last_not_in_occ, volatile sig_atomic_t *interrupt);
 struct bitvec *occ_heuristic(const struct graph *g);
 struct bitvec *occ_shrink_gray(struct occ_problem *problem);
 struct bitvec *occ_shrink_enum2col(struct occ_problem *problem);

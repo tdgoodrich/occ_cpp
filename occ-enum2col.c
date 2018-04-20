@@ -101,6 +101,14 @@ static struct bitvec *branch(struct occ_problem *problem, struct graph *occ_g,
 			     enum color *colors, struct bitvec *in_queue,
 			     vertex *qhead, vertex *qtail)
 {
+
+	// Dereference the problem interrupt pointer. If interrupt is true,
+	// we will stop branching immediately and just return NULL indicating
+	// that we didn't find an answer.
+	if (*problem->interrupt) {
+		return NULL;
+	}
+
     ALLOCA_U_BITVEC(in_queue_backup, occ_g->size);
     bitvec_copy(in_queue_backup, in_queue);
     vertex *qtail_backup = qtail;

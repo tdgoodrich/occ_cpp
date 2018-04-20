@@ -9,7 +9,8 @@
  * @param  timeout  Timeout in milliseconds.
  * @return          Tuple consisting of (best, oct, seconds).
  */
-tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &graph, long timeout, int seed)
+tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(
+    Graph &graph, volatile sig_atomic_t &interrupt, long timeout, int seed)
 {
 
     // List of solvers
@@ -33,8 +34,9 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &gra
     // Time
     const auto start = Clock::now();
 
-    // While duration is less than timeout
-    while (chrono::duration_cast<chrono::milliseconds>(Clock::now() - start).count() < timeout) {
+    // Run heuristics while duration is less than timeout and not interrupted.
+    // Ensure that at least one iteration has been run.
+    do {
 
         // Compute greedy bipartite
         auto result = solvers[idx](graph, gen);
@@ -48,7 +50,8 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(Graph &gra
         // Increment solver index
         idx = (idx + 1) % solvers.size();
 
-    }
+    } while (!interrupt &&
+             chrono::duration_cast<chrono::milliseconds>(Clock::now() - start).count() < timeout);
 
     // OCT results
     vector<int> oct, range;
