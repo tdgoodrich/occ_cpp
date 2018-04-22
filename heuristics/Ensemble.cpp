@@ -17,7 +17,7 @@ tuple<vector<int>, vector<int>, long> EnsembleSolver::heuristic_solve(
     vector<vector<int> (*)(Graph &, std::default_random_engine &)> solvers = {
         greedy_bipartite,
         greedy_stochastic,
-        greedy_bfs_bipartite,
+        greedy_dfs_bipartite,
         greedy_bfs_bipartite
     };
 
